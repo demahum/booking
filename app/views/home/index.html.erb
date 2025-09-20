@@ -1,0 +1,111 @@
+<!-- filepath: app/views/home/index.html.erb -->
+<% content_for :title, "Booking" %>
+
+<div class="calendar-container">
+  <h1><%= t('home.title') %></h1>
+  
+  <!-- Custom Calendar Grid -->
+  <div class="calendar-grid">
+    <div class="month-navigation">
+      <%= link_to "‹", root_path(month: (@current_month - 1.month).month, year: (@current_month - 1.month).year), 
+          class: "nav-arrow prev-month", title: t('home.navigation.previous_month') %>
+      
+      <h3><%= l(@current_month, format: :long) %></h3>
+      
+      <%= link_to "›", root_path(month: (@current_month + 1.month).month, year: (@current_month + 1.month).year), 
+          class: "nav-arrow next-month", title: t('home.navigation.next_month') %>
+    </div>
+    
+    <div class="calendar">
+      <div class="calendar-header">
+        <div class="day-header"><%= t('home.calendar_headers.sunday') %></div>
+        <div class="day-header"><%= t('home.calendar_headers.monday') %></div>
+        <div class="day-header"><%= t('home.calendar_headers.tuesday') %></div>
+        <div class="day-header"><%= t('home.calendar_headers.wednesday') %></div>
+        <div class="day-header"><%= t('home.calendar_headers.thursday') %></div>
+        <div class="day-header"><%= t('home.calendar_headers.friday') %></div>
+        <div class="day-header"><%= t('home.calendar_headers.saturday') %></div>
+      </div>
+      
+      <div class="calendar-body" id="calendar-body">
+        <% start_date = @current_month.beginning_of_week %>
+        <% end_date = @current_month.end_of_month.end_of_week %>
+        
+        <% (start_date..end_date).each do |date| %>
+          <% is_current_month = date.month == @current_month.month %>
+          <% is_today = date == Date.current %>
+          
+          <% # Determine if date is in selected range %>
+          <% is_range_start = @start_date == date %>
+          <% is_range_end = @end_date == date %>
+          <% is_in_range = @selected_range&.include?(date) %>
+          
+          <% css_classes = ["calendar-day"] %>
+          <% css_classes << "other-month" unless is_current_month %>
+          <% css_classes << "today" if is_today %>
+          <% css_classes << "range-start" if is_range_start %>
+          <% css_classes << "range-end" if is_range_end %>
+          <% css_classes << "in-range" if is_in_range && !is_range_start && !is_range_end %>
+          
+          <% # Create fallback URL for when JavaScript is disabled %>
+          <% if @start_date && !@end_date %>
+            <% # Currently selecting - this click completes the range %>
+            <% fallback_url = root_path(start_date: @start_date, end_date: date.strftime('%Y-%m-%d'), month: @current_month.month, year: @current_month.year) %>
+          <% else %>
+            <% # Starting new selection %>
+            <% fallback_url = root_path(start_date: date.strftime('%Y-%m-%d'), month: @current_month.month, year: @current_month.year) %>
+          <% end %>
+          
+          <a href="<%= fallback_url %>" class="<%= css_classes.join(' ') %>" 
+               data-date="<%= date.strftime('%Y-%m-%d') %>"
+               data-month="<%= @current_month.month %>"
+               data-year="<%= @current_month.year %>"
+               <% unless is_current_month %>onclick="return false;"<% end %>>
+            <%= date.day %>
+          </a>
+        <% end %>
+      </div>
+    </div>
+    
+    <div class="today-button-container">
+      <%= link_to t('home.go_to_today'), root_path, class: "today-button" %>
+      <% if @selected_range %>
+        <%= link_to t('home.clear_selection'), root_path(month: @current_month.month, year: @current_month.year), class: "clear-button" %>
+      <% end %>
+      
+      <% if @start_date && @end_date %>
+        <%= form_with url: home_save_range_path, method: :post, local: true, class: "save-range-form" do |form| %>
+          <%= form.hidden_field :start_date, value: @start_date.strftime("%Y-%m-%d") %>
+          <%= form.hidden_field :end_date, value: @end_date.strftime("%Y-%m-%d") %>
+          <%= form.submit t('home.save_range'), class: "save-range-button" %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const calendarBody = document.getElementById('calendar-body');
+  
+  if (calendarBody) {
+    calendarBody.addEventListener('click', function(event) {
+      const dateLink = event.target.closest('.calendar-day');
+      
+      // Skip if it's other-month (these are disabled)
+      if (!dateLink || dateLink.classList.contains('other-month')) {
+        return;
+      }
+      
+      // Prevent default link behavior
+      event.preventDefault();
+      
+      // Get the URL from the href attribute and navigate to it
+      const url = dateLink.getAttribute('href');
+      if (url) {
+        window.location.href = url;
+      }
+    });
+  }
+});
+</script>

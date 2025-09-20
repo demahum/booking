@@ -1,0 +1,93 @@
+en:
+  date:
+    formats:
+      default: "%Y-%m-%d"
+      long: "%B %Y"
+    month_names:
+      - 
+      - "January"
+      - "February"
+      - "March"
+      - "April"
+      - "May"
+      - "June"
+      - "July"
+      - "August"
+      - "September"
+      - "October"
+      - "November"
+      - "December"
+    abbr_month_names:
+      - 
+      - "Jan"
+      - "Feb"
+      - "Mar"
+      - "Apr"
+      - "May"
+      - "Jun"
+      - "Jul"
+      - "Aug"
+      - "Sep"
+      - "Oct"
+      - "Nov"
+      - "Dec"
+    day_names:
+      - "Sunday"
+      - "Monday"
+      - "Tuesday"
+      - "Wednesday"
+      - "Thursday"
+      - "Friday"
+      - "Saturday"
+    abbr_day_names:
+      - "Sun"
+      - "Mon"
+      - "Tue"
+      - "Wed"
+      - "Thu"
+      - "Fri"
+      - "Sat"
+
+  home:
+    title: "Select a Date Range"
+    go_to_today: "Go To Today"
+    clear_selection: "Clear Selection"
+    save_range: "Save Range"
+    calendar_headers:
+      sunday: "Sun"
+      monday: "Mon"
+      tuesday: "Tue"
+      wednesday: "Wed"
+      thursday: "Thu"
+      friday: "Fri"
+      saturday: "Sat"
+    navigation:
+      previous_month: "Previous month"
+      next_month: "Next month"
+      go_to_today_title: "Go to today"
+    
+  messages:
+    range_saved_success: "Date range saved successfully!"
+    select_complete_range: "Please select a complete date range before saving."
+    invalid_date_format: "Invalid date format."
+    save_error: "Error saving date range"
+    
+  language:
+    picker:
+      english: "English"
+      bosnian: "Bosanski"
+      switch_to: "Switch to"
+    
+  activerecord:
+    models:
+      date_range: "Date Range"
+    attributes:
+      date_range:
+        start_date: "Start date"
+        end_date: "End date"
+    errors:
+      models:
+        date_range:
+          attributes:
+            end_date:
+              after_start_date: "must be after start date"

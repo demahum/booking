@@ -1,0 +1,93 @@
+bs:
+  date:
+    formats:
+      default: "%d.%m.%Y"
+      long: "%d. %B %Y"
+    month_names:
+      - 
+      - "Januar"
+      - "Februar"
+      - "Mart"
+      - "April"
+      - "Maj"
+      - "Juni"
+      - "Juli"
+      - "August"
+      - "Septembar"
+      - "Oktobar"
+      - "Novembar"
+      - "Decembar"
+    abbr_month_names:
+      - 
+      - "Jan"
+      - "Feb"
+      - "Mar"
+      - "Apr"
+      - "Maj"
+      - "Jun"
+      - "Jul"
+      - "Aug"
+      - "Sep"
+      - "Okt"
+      - "Nov"
+      - "Dec"
+    day_names:
+      - "Nedjelja"
+      - "Ponedjeljak"
+      - "Utorak"
+      - "Srijeda"
+      - "Četvrtak"
+      - "Petak"
+      - "Subota"
+    abbr_day_names:
+      - "Ned"
+      - "Pon"
+      - "Uto"
+      - "Sri"
+      - "Čet"
+      - "Pet"
+      - "Sub"
+
+  home:
+    title: "Odaberite Raspon Datuma"
+    go_to_today: "Idi na Danas"
+    clear_selection: "Obriši Odabir"
+    save_range: "Sačuvaj Raspon"
+    calendar_headers:
+      sunday: "Ned"
+      monday: "Pon"
+      tuesday: "Uto"
+      wednesday: "Sri"
+      thursday: "Čet"
+      friday: "Pet"
+      saturday: "Sub"
+    navigation:
+      previous_month: "Prethodnji mjesec"
+      next_month: "Sljedeći mjesec"
+      go_to_today_title: "Idi na danas"
+    
+  messages:
+    range_saved_success: "Raspon datuma je uspješno sačuvan!"
+    select_complete_range: "Molimo odaberite kompletan raspon datuma prije čuvanja."
+    invalid_date_format: "Neispravni format datuma."
+    save_error: "Greška pri čuvanju raspona datuma"
+    
+  language:
+    picker:
+      english: "English"
+      bosnian: "Bosanski"
+      switch_to: "Prebaci na"
+    
+  activerecord:
+    models:
+      date_range: "Raspon Datuma"
+    attributes:
+      date_range:
+        start_date: "Početni datum"
+        end_date: "Završni datum"
+    errors:
+      models:
+        date_range:
+          attributes:
+            end_date:
+              after_start_date: "mora biti nakon početnog datuma"
