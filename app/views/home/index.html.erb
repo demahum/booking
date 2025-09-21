@@ -7,29 +7,29 @@
   <!-- Custom Calendar Grid -->
   <div class="calendar-grid">
     <div class="month-navigation">
-      <%= link_to "‹", root_path(month: (@current_month - 1.month).month, year: (@current_month - 1.month).year), 
+      <%= link_to "‹", root_path(month: (@current_month - 1.month).month, year: (@current_month - 1.month).year, locale: I18n.locale), 
           class: "nav-arrow prev-month", title: t('home.navigation.previous_month') %>
       
       <h3><%= l(@current_month, format: :long) %></h3>
       
-      <%= link_to "›", root_path(month: (@current_month + 1.month).month, year: (@current_month + 1.month).year), 
+      <%= link_to "›", root_path(month: (@current_month + 1.month).month, year: (@current_month + 1.month).year, locale: I18n.locale), 
           class: "nav-arrow next-month", title: t('home.navigation.next_month') %>
     </div>
     
     <div class="calendar">
       <div class="calendar-header">
-        <div class="day-header"><%= t('home.calendar_headers.sunday') %></div>
         <div class="day-header"><%= t('home.calendar_headers.monday') %></div>
         <div class="day-header"><%= t('home.calendar_headers.tuesday') %></div>
         <div class="day-header"><%= t('home.calendar_headers.wednesday') %></div>
         <div class="day-header"><%= t('home.calendar_headers.thursday') %></div>
         <div class="day-header"><%= t('home.calendar_headers.friday') %></div>
         <div class="day-header"><%= t('home.calendar_headers.saturday') %></div>
+        <div class="day-header"><%= t('home.calendar_headers.sunday') %></div>
       </div>
       
       <div class="calendar-body" id="calendar-body">
-        <% start_date = @current_month.beginning_of_week %>
-        <% end_date = @current_month.end_of_month.end_of_week %>
+        <% start_date = @current_month.beginning_of_week(:monday) %>
+        <% end_date = @current_month.end_of_month.end_of_week(:monday) %>
         
         <% (start_date..end_date).each do |date| %>
           <% is_current_month = date.month == @current_month.month %>
@@ -50,10 +50,10 @@
           <% # Create fallback URL for when JavaScript is disabled %>
           <% if @start_date && !@end_date %>
             <% # Currently selecting - this click completes the range %>
-            <% fallback_url = root_path(start_date: @start_date, end_date: date.strftime('%Y-%m-%d'), month: @current_month.month, year: @current_month.year) %>
+            <% fallback_url = root_path(start_date: @start_date, end_date: date.strftime('%Y-%m-%d'), month: @current_month.month, year: @current_month.year, locale: I18n.locale) %>
           <% else %>
             <% # Starting new selection %>
-            <% fallback_url = root_path(start_date: date.strftime('%Y-%m-%d'), month: @current_month.month, year: @current_month.year) %>
+            <% fallback_url = root_path(start_date: date.strftime('%Y-%m-%d'), month: @current_month.month, year: @current_month.year, locale: I18n.locale) %>
           <% end %>
           
           <a href="<%= fallback_url %>" class="<%= css_classes.join(' ') %>" 
@@ -67,19 +67,31 @@
       </div>
     </div>
     
-    <div class="today-button-container">
-      <%= link_to t('home.go_to_today'), root_path, class: "today-button" %>
-      <% if @selected_range %>
-        <%= link_to t('home.clear_selection'), root_path(month: @current_month.month, year: @current_month.year), class: "clear-button" %>
-      <% end %>
-      
-      <% if @start_date && @end_date %>
-        <%= form_with url: home_save_range_path, method: :post, local: true, class: "save-range-form" do |form| %>
-          <%= form.hidden_field :start_date, value: @start_date.strftime("%Y-%m-%d") %>
-          <%= form.hidden_field :end_date, value: @end_date.strftime("%Y-%m-%d") %>
-          <%= form.submit t('home.save_range'), class: "save-range-button" %>
+    <!-- Day Count and Buttons Layout -->
+    <div class="bottom-section">
+      <!-- Day Count Display - Always visible, positioned at bottom-left of calendar -->
+      <div class="day-count-container">
+        <% if @start_date && @end_date %>
+          <% day_count = (@end_date - @start_date).to_i %>
+        <% else %>
+          <% day_count = 0 %>
         <% end %>
-      <% end %>
+        <div class="day-count">
+          <%= t('home.days_selected', count: day_count) %>
+        </div>
+      </div>
+      
+      <div class="today-button-container">
+        <%= link_to t('home.go_to_today'), root_path(locale: I18n.locale), class: "today-button" %>
+        
+        <% if @start_date && @end_date %>
+          <%= form_with url: home_save_range_path, method: :post, local: true, class: "save-range-form" do |form| %>
+            <%= form.hidden_field :start_date, value: @start_date.strftime("%Y-%m-%d") %>
+            <%= form.hidden_field :end_date, value: @end_date.strftime("%Y-%m-%d") %>
+            <%= form.submit t('home.save_range'), class: "save-range-button" %>
+          <% end %>
+        <% end %>
+      </div>
     </div>
   </div>
 </div>

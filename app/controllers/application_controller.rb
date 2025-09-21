@@ -21,8 +21,10 @@ class ApplicationController < ActionController::Base
   private
   
   def set_locale
-    # Only use session locale if it was explicitly set, otherwise use default (English)
-    if session[:locale].present? && I18n.available_locales.include?(session[:locale].to_sym)
+    # Check URL parameter first, then session, then default to English
+    if params[:locale].present? && I18n.available_locales.include?(params[:locale].to_sym)
+      I18n.locale = params[:locale]
+    elsif session[:locale].present? && I18n.available_locales.include?(session[:locale].to_sym)
       I18n.locale = session[:locale]
     else
       I18n.locale = I18n.default_locale

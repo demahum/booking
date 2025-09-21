@@ -53,14 +53,18 @@ en:
     go_to_today: "Go To Today"
     clear_selection: "Clear Selection"
     save_range: "Save Range"
+    days_selected:
+      one: "Number of nights: %{count}"
+      other: "Number of nights: %{count}"
+    selecting_range: "Selecting range..."
     calendar_headers:
-      sunday: "Sun"
       monday: "Mon"
       tuesday: "Tue"
       wednesday: "Wed"
       thursday: "Thu"
       friday: "Fri"
       saturday: "Sat"
+      sunday: "Sun"
     navigation:
       previous_month: "Previous month"
       next_month: "Next month"

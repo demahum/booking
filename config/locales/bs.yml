@@ -2,7 +2,7 @@ bs:
   date:
     formats:
       default: "%d.%m.%Y"
-      long: "%d. %B %Y"
+      long: "%B %Y"
     month_names:
       - 
       - "Januar"
@@ -50,17 +50,22 @@ bs:
 
   home:
     title: "Odaberite Raspon Datuma"
-    go_to_today: "Idi na Danas"
-    clear_selection: "Obriši Odabir"
-    save_range: "Sačuvaj Raspon"
+    go_to_today: "Vrati se na današnji datum"
+    clear_selection: "Poništi Odabir"
+    save_range: "Rezerviraj odabrane datume"
+    days_selected:
+      one: "Broj noćenja: %{count}"
+      few: "Broj noćenja: %{count}"
+      other: "Broj noćenja: %{count}"
+    selecting_range: "Odabiranje raspona..."
     calendar_headers:
-      sunday: "Ned"
       monday: "Pon"
       tuesday: "Uto"
       wednesday: "Sri"
       thursday: "Čet"
       friday: "Pet"
       saturday: "Sub"
+      sunday: "Ned"
     navigation:
       previous_month: "Prethodnji mjesec"
       next_month: "Sljedeći mjesec"

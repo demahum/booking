@@ -135,13 +135,60 @@
   font-weight: bold;
 }
 
+/* Bottom Section Layout - Day count left, buttons center */
+.bottom-section {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin: 10px 0 15px 0;
+}
+
+/* Day Count Display */
+.day-count-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.day-count {
+  display: inline-block;
+  padding: 5px 0;
+  background-color: transparent;
+  color: #495057;
+  border: none;
+  border-radius: 0;
+  font-size: 16px;
+  font-weight: 500;
+  box-shadow: none;
+  border-bottom: 2px solid #007bff;
+}
+
+.day-count.selecting {
+  background-color: transparent;
+  color: #856404;
+  border-bottom-color: #ffc107;
+  animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.8;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .today-button-container {
-  text-align: center;
-  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 .today-button {
-  display: inline-block;
+  display: block;
   padding: 12px 24px;
   background-color: #28a745;
   color: white;
@@ -162,7 +209,7 @@
 }
 
 .clear-button {
-  display: inline-block;
+  display: block;
   padding: 12px 24px;
   background-color: #dc3545;
   color: white;
@@ -172,7 +219,6 @@
   font-size: 16px;
   transition: background-color 0.2s, transform 0.1s;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  margin-left: 10px;
 }
 
 .clear-button:hover {
@@ -184,12 +230,11 @@
 }
 
 .save-range-form {
-  display: inline-block;
-  margin-left: 10px;
+  display: block;
 }
 
 .save-range-button {
-  display: inline-block;
+  display: block;
   padding: 12px 24px;
   background-color: #17a2b8;
   color: white;
@@ -341,6 +386,10 @@
 
 .calendar-day:nth-child(7n) {
   border-right: none;
+}
+
+.calendar-day.today:nth-child(7n) {
+  border-right: 2px solid #ffc107;
 }
 
 @media (max-width: 768px) {
