@@ -7,12 +7,29 @@
   <!-- Custom Calendar Grid -->
   <div class="calendar-grid">
     <div class="month-navigation">
-      <%= link_to "‹", root_path(month: (@current_month - 1.month).month, year: (@current_month - 1.month).year, locale: I18n.locale), 
+      <% # Preserve selection state when navigating months %>
+      <% prev_month_params = { 
+           month: (@current_month - 1.month).month, 
+           year: (@current_month - 1.month).year, 
+           locale: I18n.locale 
+         } %>
+      <% prev_month_params[:start_date] = @start_date.strftime('%Y-%m-%d') if @start_date %>
+      <% prev_month_params[:end_date] = @end_date.strftime('%Y-%m-%d') if @end_date %>
+      
+      <%= link_to "‹", root_path(prev_month_params), 
           class: "nav-arrow prev-month", title: t('home.navigation.previous_month') %>
       
       <h3><%= l(@current_month, format: :long) %></h3>
       
-      <%= link_to "›", root_path(month: (@current_month + 1.month).month, year: (@current_month + 1.month).year, locale: I18n.locale), 
+      <% next_month_params = { 
+           month: (@current_month + 1.month).month, 
+           year: (@current_month + 1.month).year, 
+           locale: I18n.locale 
+         } %>
+      <% next_month_params[:start_date] = @start_date.strftime('%Y-%m-%d') if @start_date %>
+      <% next_month_params[:end_date] = @end_date.strftime('%Y-%m-%d') if @end_date %>
+      
+      <%= link_to "›", root_path(next_month_params), 
           class: "nav-arrow next-month", title: t('home.navigation.next_month') %>
     </div>
     
@@ -34,6 +51,15 @@
         <% (start_date..end_date).each do |date| %>
           <% is_current_month = date.month == @current_month.month %>
           <% is_today = date == Date.current %>
+          <% is_booked = @booked_dates.include?(date) %>
+          
+          <% # Check if this date would create a conflict when selected as end date %>
+          <% would_conflict = false %>
+          <% if @start_date && !@end_date && date != @start_date && !is_booked %>
+            <% range_start = [@start_date, date].min %>
+            <% range_end = [@start_date, date].max %>
+            <% would_conflict = (range_start + 1.day...range_end).any? { |d| @booked_dates.include?(d) } %>
+          <% end %>
           
           <% # Determine if date is in selected range %>
           <% is_range_start = @start_date == date %>
@@ -43,26 +69,54 @@
           <% css_classes = ["calendar-day"] %>
           <% css_classes << "other-month" unless is_current_month %>
           <% css_classes << "today" if is_today %>
-          <% css_classes << "range-start" if is_range_start %>
-          <% css_classes << "range-end" if is_range_end %>
-          <% css_classes << "in-range" if is_in_range && !is_range_start && !is_range_end %>
+          <% css_classes << "booked" if is_booked %>
+          <% css_classes << "would-conflict" if would_conflict %>
+          <% css_classes << "range-start" if is_range_start && !is_booked %>
+          <% css_classes << "range-end" if is_range_end && !is_booked %>
+          <% css_classes << "in-range" if is_in_range && !is_range_start && !is_range_end && !is_booked %>
           
           <% # Create fallback URL for when JavaScript is disabled %>
           <% if @start_date && !@end_date %>
-            <% # Currently selecting - this click completes the range %>
-            <% fallback_url = root_path(start_date: @start_date, end_date: date.strftime('%Y-%m-%d'), month: @current_month.month, year: @current_month.year, locale: I18n.locale) %>
+            <% # Currently selecting - this click completes the range, but only if different date %>
+            <% if date == @start_date %>
+              <% # Same date clicked, start new selection %>
+              <% fallback_url = root_path(start_date: date.strftime('%Y-%m-%d'), month: @current_month.month, year: @current_month.year, locale: I18n.locale) %>
+            <% else %>
+              <% # Check if this end date would conflict with booked dates %>
+              <% range_start = [@start_date, date].min %>
+              <% range_end = [@start_date, date].max %>
+              <% conflicts_with_bookings = (range_start + 1.day...range_end).any? { |d| @booked_dates.include?(d) } %>
+              
+              <% if conflicts_with_bookings %>
+                <% # Conflict detected - start new selection with this date instead %>
+                <% fallback_url = root_path(start_date: date.strftime('%Y-%m-%d'), month: @current_month.month, year: @current_month.year, locale: I18n.locale) %>
+              <% else %>
+                <% # No conflict, complete the range %>
+                <% fallback_url = root_path(start_date: @start_date, end_date: date.strftime('%Y-%m-%d'), month: @current_month.month, year: @current_month.year, locale: I18n.locale) %>
+              <% end %>
+            <% end %>
           <% else %>
             <% # Starting new selection %>
             <% fallback_url = root_path(start_date: date.strftime('%Y-%m-%d'), month: @current_month.month, year: @current_month.year, locale: I18n.locale) %>
           <% end %>
           
-          <a href="<%= fallback_url %>" class="<%= css_classes.join(' ') %>" 
-               data-date="<%= date.strftime('%Y-%m-%d') %>"
-               data-month="<%= @current_month.month %>"
-               data-year="<%= @current_month.year %>"
-               <% unless is_current_month %>onclick="return false;"<% end %>>
-            <%= date.day %>
-          </a>
+          <% if is_booked || would_conflict %>
+            <% # Booked dates and conflicting dates are not clickable %>
+            <div class="<%= css_classes.join(' ') %>" 
+                 data-date="<%= date.strftime('%Y-%m-%d') %>"
+                 data-month="<%= @current_month.month %>"
+                 data-year="<%= @current_month.year %>">
+              <%= date.day %>
+            </div>
+          <% else %>
+            <% # Clickable dates %>
+            <a href="<%= fallback_url %>" class="<%= css_classes.join(' ') %>" 
+                 data-date="<%= date.strftime('%Y-%m-%d') %>"
+                 data-month="<%= @current_month.month %>"
+                 data-year="<%= @current_month.year %>">
+              <%= date.day %>
+            </a>
+          <% end %>
         <% end %>
       </div>
     </div>
@@ -82,7 +136,13 @@
       </div>
       
       <div class="today-button-container">
-        <%= link_to t('home.go_to_today'), root_path(locale: I18n.locale), class: "today-button" %>
+        <% # Only show "Current Month" button if user is not viewing current month %>
+        <% if @current_month.month != Date.current.month || @current_month.year != Date.current.year %>
+          <% today_params = { locale: I18n.locale } %>
+          <% today_params[:start_date] = @start_date.strftime('%Y-%m-%d') if @start_date %>
+          <% today_params[:end_date] = @end_date.strftime('%Y-%m-%d') if @end_date %>
+          <%= link_to t('home.go_to_today'), root_path(today_params), class: "today-button" %>
+        <% end %>
         
         <% if @start_date && @end_date %>
           <%= form_with url: home_save_range_path, method: :post, local: true, class: "save-range-form" do |form| %>
@@ -104,15 +164,34 @@ document.addEventListener('DOMContentLoaded', function() {
     calendarBody.addEventListener('click', function(event) {
       const dateLink = event.target.closest('.calendar-day');
       
-      // Skip if it's other-month (these are disabled)
-      if (!dateLink || dateLink.classList.contains('other-month')) {
+      // Skip if it's booked or would conflict (these are disabled)
+      if (!dateLink || dateLink.classList.contains('booked') || dateLink.classList.contains('would-conflict')) {
         return;
       }
       
       // Prevent default link behavior
       event.preventDefault();
       
-      // Get the URL from the href attribute and navigate to it
+      // Get the clicked date
+      const clickedDate = dateLink.getAttribute('data-date');
+      
+      // Check if there's already a start date selected
+      const startDateElement = document.querySelector('.calendar-day.range-start');
+      
+      // If there's a start date and user clicks the same date, restart selection
+      if (startDateElement) {
+        const startDate = startDateElement.getAttribute('data-date');
+        if (startDate === clickedDate) {
+          // Same date clicked - just refresh to restart selection with this date
+          const url = dateLink.getAttribute('href');
+          if (url) {
+            window.location.href = url;
+          }
+          return;
+        }
+      }
+      
+      // Otherwise, proceed with normal selection
       const url = dateLink.getAttribute('href');
       if (url) {
         window.location.href = url;

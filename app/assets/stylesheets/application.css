@@ -98,12 +98,12 @@
 }
 
 .btn-primary {
-  background-color: #007bff;
+  background-color: #28a745;
   color: white;
 }
 
 .btn-primary:hover {
-  background-color: #0056b3;
+  background-color: #1e7e34;
 }
 
 .selected-date {
@@ -161,13 +161,11 @@
   font-size: 16px;
   font-weight: 500;
   box-shadow: none;
-  border-bottom: 2px solid #007bff;
 }
 
 .day-count.selecting {
   background-color: transparent;
   color: #856404;
-  border-bottom-color: #ffc107;
   animation: pulse 1.5s ease-in-out infinite alternate;
 }
 
@@ -236,7 +234,7 @@
 .save-range-button {
   display: block;
   padding: 12px 24px;
-  background-color: #17a2b8;
+  background-color: #007bff;
   color: white;
   text-decoration: none;
   border: none;
@@ -249,7 +247,7 @@
 }
 
 .save-range-button:hover {
-  background-color: #138496;
+  background-color: #0056b3;
   color: white;
   text-decoration: none;
   transform: translateY(-1px);
@@ -324,28 +322,51 @@
 .calendar-day.other-month {
   color: #999;
   background-color: #f8f9fa;
-  cursor: not-allowed;
+  cursor: pointer;
 }
 
 .calendar-day.other-month:hover {
-  background-color: #f8f9fa;
+  background-color: #e9ecef;
+  color: #666;
 }
 
 .calendar-day.range-start {
-  background-color: #007bff;
+  background-color: #28a745;
   color: white;
   font-weight: bold;
 }
 
 .calendar-day.range-end {
-  background-color: #007bff;
+  background-color: #28a745;
   color: white;
   font-weight: bold;
 }
 
 .calendar-day.in-range {
-  background-color: #b3d9ff;
+  background-color: #b3e5c7;
   color: #333;
+}
+
+.calendar-day.booked {
+  background-color: #ffcccb;
+  color: #721c24;
+  cursor: not-allowed;
+}
+
+.calendar-day.booked:hover {
+  background-color: #ffcccb;
+  cursor: not-allowed;
+}
+
+.calendar-day.would-conflict {
+  background-color: #fff3cd;
+  color: #856404;
+  cursor: not-allowed;
+}
+
+.calendar-day.would-conflict:hover {
+  background-color: #fff3cd;
+  cursor: not-allowed;
 }
 
 .calendar-day.today {
@@ -355,12 +376,12 @@
 
 .calendar-day.today.range-start,
 .calendar-day.today.range-end {
-  background-color: #0056b3;
+  background-color: #1e7e34;
   border: 2px solid #ffc107;
 }
 
 .calendar-day.today.in-range {
-  background-color: #99ccff;
+  background-color: #99d9b3;
   border: 2px solid #ffc107;
 }
 
@@ -410,5 +431,46 @@
   
   .btn {
     width: 100%;
+  }
+  
+  /* Fix language picker overlap on mobile */
+  .language-picker {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+  }
+  
+  .language-button {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 15px;
+  }
+  
+  /* Add top margin to calendar container to prevent overlap */
+  .calendar-container {
+    padding: 60px 10px 10px 10px;
+  }
+  
+  .calendar-container h1 {
+    margin-top: 0;
+    font-size: 24px;
+  }
+  
+  /* Fix mobile layout for bottom section */
+  .bottom-section {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .day-count-container {
+    position: static;
+    order: 1;
+    margin-bottom: 10px;
+  }
+  
+  .today-button-container {
+    order: 2;
   }
 }

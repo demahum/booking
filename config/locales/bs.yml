@@ -50,7 +50,7 @@ bs:
 
   home:
     title: "Odaberite Raspon Datuma"
-    go_to_today: "Vrati se na današnji datum"
+    go_to_today: "Vrati se na trenutni mjesec"
     clear_selection: "Poništi Odabir"
     save_range: "Rezerviraj odabrane datume"
     days_selected:

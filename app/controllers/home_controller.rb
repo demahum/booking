@@ -18,6 +18,21 @@ class HomeController < ApplicationController
       @start_date, @end_date = @end_date, @start_date
     end
     
+    # Load existing bookings to show as unavailable
+    @booked_dates = Set.new
+    DateRange.all.each do |booking|
+      (booking.start_date..booking.end_date).each do |date|
+        @booked_dates.add(date)
+      end
+    end
+    
+    # Check if the selected range conflicts with existing bookings
+    if @start_date && @end_date && range_conflicts_with_bookings?(@start_date, @end_date, @booked_dates)
+      # Reset the conflicting selection
+      @start_date = params[:start_date] ? Date.parse(params[:start_date]) : nil
+      @end_date = nil
+    end
+    
     # Create date range for easier checking
     @selected_range = if @start_date && @end_date
                        (@start_date..@end_date)
@@ -59,5 +74,12 @@ class HomeController < ApplicationController
     end
   rescue ArgumentError
     redirect_to root_path, alert: t('messages.invalid_date_format')
+  end
+  
+  private
+  
+  def range_conflicts_with_bookings?(start_date, end_date, booked_dates)
+    # Check if any date in the proposed range (excluding start and end) is already booked
+    (start_date + 1.day...end_date).any? { |date| booked_dates.include?(date) }
   end
 end

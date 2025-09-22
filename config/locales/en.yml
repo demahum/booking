@@ -50,7 +50,7 @@ en:
 
   home:
     title: "Select a Date Range"
-    go_to_today: "Go To Today"
+    go_to_today: "Go back to current month"
     clear_selection: "Clear Selection"
     save_range: "Save Range"
     days_selected:
