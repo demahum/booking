@@ -49,7 +49,7 @@ en:
       - "Sat"
 
   home:
-    title: "Select a Date Range"
+    title: "Select a Date Range for Your Stay"
     go_to_today: "Go back to current month"
     clear_selection: "Clear Selection"
     save_range: "Save Range"
@@ -69,9 +69,14 @@ en:
       previous_month: "Previous month"
       next_month: "Next month"
       go_to_today_title: "Go to today"
+    confirm_booking: "Confirm Booking"
+    confirm_first_date: "Arrival date:"
+    confirm_last_date: "Departure date:"
+    cancel: "Cancel"
+    confirm: "Confirm"
     
   messages:
-    range_saved_success: "Date range saved successfully!"
+    range_saved_success: "Reservation successful!"
     select_complete_range: "Please select a complete date range before saving."
     invalid_date_format: "Invalid date format."
     save_error: "Error saving date range"

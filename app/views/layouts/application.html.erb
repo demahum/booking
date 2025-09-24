@@ -20,6 +20,24 @@
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    
+    <script>
+      // Global helper function to handle locale-specific page initialization
+      window.reinitializePageAfterLocaleChange = function() {
+        console.log('Locale change detected, reinitializing page components');
+        
+        // Dispatch a custom event that page scripts can listen for
+        document.dispatchEvent(new CustomEvent('localeChanged', {
+          detail: { locale: '<%= I18n.locale.to_s %>' }
+        }));
+        
+        // If a global initialization function exists, call it
+        if (typeof window.initializeBookingUI === 'function') {
+          console.log('Calling initializeBookingUI');
+          window.initializeBookingUI();
+        }
+      };
+    </script>
   </head>
 
   <body>
@@ -27,11 +45,13 @@
       <% if I18n.locale == :en %>
         <%= link_to t('language.picker.bosnian'), switch_locale_path(:bs), 
             class: "language-button", 
-            title: "#{t('language.picker.switch_to')} #{t('language.picker.bosnian')}" %>
+            title: "#{t('language.picker.switch_to')} #{t('language.picker.bosnian')}",
+            data: { turbo: false } %>
       <% else %>
         <%= link_to t('language.picker.english'), switch_locale_path(:en), 
             class: "language-button", 
-            title: "#{t('language.picker.switch_to')} #{t('language.picker.english')}" %>
+            title: "#{t('language.picker.switch_to')} #{t('language.picker.english')}",
+            data: { turbo: false } %>
       <% end %>
     </div>
     

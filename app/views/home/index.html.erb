@@ -145,58 +145,248 @@
         <% end %>
         
         <% if @start_date && @end_date %>
-          <%= form_with url: home_save_range_path, method: :post, local: true, class: "save-range-form" do |form| %>
-            <%= form.hidden_field :start_date, value: @start_date.strftime("%Y-%m-%d") %>
-            <%= form.hidden_field :end_date, value: @end_date.strftime("%Y-%m-%d") %>
-            <%= form.submit t('home.save_range'), class: "save-range-button" %>
-          <% end %>
+          <button id="show-confirmation" class="save-range-button"><%= t('home.save_range') %></button>
+          
+          <form action="<%= home_save_range_path %>" method="post" id="save-range-form" style="display: none;">
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+            <input type="hidden" name="start_date" value="<%= @start_date.strftime("%Y-%m-%d") %>">
+            <input type="hidden" name="end_date" value="<%= @end_date.strftime("%Y-%m-%d") %>">
+            <input type="hidden" name="locale" value="<%= I18n.locale %>">
+          </form>
         <% end %>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Add the toast/confirmation popup -->
+<div id="confirmation-toast" class="confirmation-toast" style="display: none;">
+  <div class="confirmation-content">
+    <h3><%= t('home.confirm_booking') %></h3>
+    <p class="date-range-display">
+      <%= t('home.confirm_first_date') %> <span id="confirm-start-date"></span><br>
+      <%= t('home.confirm_last_date') %> <span id="confirm-end-date"></span>
+    </p>
+    <div class="confirmation-buttons">
+      <button id="confirm-cancel" class="btn btn-secondary"><%= t('home.cancel') %></button>
+      <button id="confirm-save" class="btn btn-success"><%= t('home.confirm') %></button>
+    </div>
+  </div>
+</div>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const calendarBody = document.getElementById('calendar-body');
+// Global initialization function that will run on both initial page load and after AJAX/Turbo updates
+function initializeBookingUI() {
+  console.log('Initializing booking UI - ' + new Date().toISOString());
   
-  if (calendarBody) {
-    calendarBody.addEventListener('click', function(event) {
-      const dateLink = event.target.closest('.calendar-day');
-      
-      // Skip if it's booked or would conflict (these are disabled)
-      if (!dateLink || dateLink.classList.contains('booked') || dateLink.classList.contains('would-conflict')) {
-        return;
-      }
-      
-      // Prevent default link behavior
-      event.preventDefault();
-      
-      // Get the clicked date
-      const clickedDate = dateLink.getAttribute('data-date');
-      
-      // Check if there's already a start date selected
-      const startDateElement = document.querySelector('.calendar-day.range-start');
-      
-      // If there's a start date and user clicks the same date, restart selection
-      if (startDateElement) {
-        const startDate = startDateElement.getAttribute('data-date');
-        if (startDate === clickedDate) {
-          // Same date clicked - just refresh to restart selection with this date
-          const url = dateLink.getAttribute('href');
-          if (url) {
-            window.location.href = url;
-          }
-          return;
+  // Get the current locale from the page - ensure it's a string and trim whitespace
+  var currentLocale = '<%= I18n.locale.to_s %>'.trim();
+  console.log('Current locale detected:', currentLocale, 'Type:', typeof currentLocale);
+  
+  // Force locale to be a clean string, no whitespace or hidden characters
+  currentLocale = currentLocale.replace(/\s/g, '');
+  
+  // Simple function to format dates based on locale
+  function formatDate(dateStr) {
+    var date = new Date(dateStr);
+    var day = date.getDate();
+    var month = date.getMonth();
+    var year = date.getFullYear();
+    
+    var monthNames = {
+      en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+      bs: ['Januar', 'Februar', 'Mart', 'April', 'Maj', 'Juni', 'Juli', 'August', 'Septembar', 'Oktobar', 'Novembar', 'Decembar']
+    };
+    
+    console.log('Formatting date for locale:', currentLocale, 'Date:', date);
+    
+    // Check if locale is Bosnian, otherwise default to English
+    // Use both === and string includes for extra safety
+    if (currentLocale === 'bs' || currentLocale.indexOf('bs') >= 0) {
+      console.log('Using Bosnian date format');
+      return day + '. ' + monthNames.bs[month] + ' ' + year;
+    } else {
+      console.log('Using English date format');
+      return monthNames.en[month] + ' ' + day + ', ' + year;
+    }
+  }
+
+  // Remove any existing event listeners (for page refresh or locale change)
+  function removeExistingListeners() {
+    console.log('Removing any existing event listeners');
+    
+    var elements = {
+      'show-confirmation': document.getElementById('show-confirmation'),
+      'confirm-cancel': document.getElementById('confirm-cancel'),
+      'confirm-save': document.getElementById('confirm-save'),
+      'calendar-body': document.getElementById('calendar-body')
+    };
+    
+    // Clone elements to remove all event listeners
+    for (var id in elements) {
+      if (elements[id]) {
+        var oldElement = elements[id];
+        var newElement = oldElement.cloneNode(true);
+        if (oldElement.parentNode) {
+          oldElement.parentNode.replaceChild(newElement, oldElement);
+          console.log('Replaced element with clone:', id);
         }
       }
-      
-      // Otherwise, proceed with normal selection
-      const url = dateLink.getAttribute('href');
-      if (url) {
-        window.location.href = url;
-      }
-    });
+    }
   }
+
+  // Handle calendar day clicks for selection
+  function setupCalendarClicks() {
+    var calendarBody = document.getElementById('calendar-body');
+    if (calendarBody) {
+      calendarBody.addEventListener('click', function(event) {
+        var dateLink = event.target.closest('.calendar-day');
+        if (!dateLink || dateLink.classList.contains('booked') || dateLink.classList.contains('would-conflict')) {
+          return;
+        }
+        
+        event.preventDefault();
+        var url = dateLink.getAttribute('href');
+        if (url) {
+          window.location.href = url;
+        }
+      });
+      console.log('Calendar click handler attached');
+    }
+  }
+  
+  // Setup confirmation popup functionality
+  function setupConfirmationPopup() {
+    console.log('Setting up confirmation popup for locale:', currentLocale);
+    
+    // Get all necessary elements
+    var showConfirmationBtn = document.getElementById('show-confirmation');
+    var confirmationToast = document.getElementById('confirmation-toast');
+    var confirmStartDate = document.getElementById('confirm-start-date');
+    var confirmEndDate = document.getElementById('confirm-end-date');
+    var saveForm = document.getElementById('save-range-form');
+    var cancelBtn = document.getElementById('confirm-cancel');
+    var confirmBtn = document.getElementById('confirm-save');
+    
+    // Log button text and classes to help with debugging
+    console.log('Save Range Button:', showConfirmationBtn ? {
+      id: showConfirmationBtn.id,
+      text: showConfirmationBtn.textContent,
+      classes: showConfirmationBtn.className,
+      disabled: showConfirmationBtn.disabled
+    } : 'Not found');
+    
+    // Only proceed if required elements are found
+    if (!showConfirmationBtn || !confirmationToast) {
+      console.error('Missing critical elements for confirmation popup');
+      return;
+    }
+    
+    // Show confirmation popup when save button is clicked
+    console.log('Adding click event listener to save button');
+    
+    // Create a single handler function for all event types
+    function showPopupHandler(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('Save button event triggered - locale:', currentLocale);
+      
+      try {
+        // Show popup first, to ensure UI responsiveness
+        confirmationToast.style.display = 'flex';
+        
+        // Then populate the dates if possible
+        if (saveForm && confirmStartDate && confirmEndDate) {
+          var startDateInput = saveForm.querySelector('[name="start_date"]');
+          var endDateInput = saveForm.querySelector('[name="end_date"]');
+          
+          if (startDateInput && endDateInput) {
+            var startDate = startDateInput.value;
+            var endDate = endDateInput.value;
+            
+            confirmStartDate.textContent = formatDate(startDate);
+            confirmEndDate.textContent = formatDate(endDate);
+            console.log('Dates formatted and displayed');
+          }
+        }
+      } catch(error) {
+        console.error('Error showing confirmation:', error);
+      }
+      
+      return false;
+    }
+    
+    // Add multiple event types to ensure it works
+    ['click', 'mousedown', 'touchstart'].forEach(function(eventType) {
+      showConfirmationBtn.addEventListener(eventType, showPopupHandler, true);
+    });
+    
+    // Make sure the button appears clickable
+    showConfirmationBtn.style.cursor = 'pointer';
+    
+    // Handle cancel button
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', function() {
+        console.log('Cancel button clicked');
+        confirmationToast.style.display = 'none';
+      });
+    }
+    
+    // Handle confirm button - submit the form
+    if (confirmBtn && saveForm) {
+      confirmBtn.addEventListener('click', function() {
+        console.log('Confirm button clicked, submitting form');
+        confirmationToast.style.display = 'none';
+        saveForm.submit();
+      });
+    }
+    
+    console.log('Confirmation popup setup complete');
+  }
+  
+  // First remove any existing listeners to avoid duplicates
+  removeExistingListeners();
+  
+  // Setup all handlers
+  setupCalendarClicks();
+  setupConfirmationPopup();
+}
+
+// Make the initialization function globally available
+window.initializeBookingUI = initializeBookingUI;
+
+// Run on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('Document loaded - Starting initial setup');
+  initializeBookingUI();
 });
+
+// Custom event for locale changes
+document.addEventListener('localeChanged', function(event) {
+  console.log('Locale changed event received:', event.detail);
+  initializeBookingUI();
+});
+
+// Run after page loads (including ajax-based locale changes)
+window.addEventListener('load', function() {
+  console.log('Window loaded - Reinitializing');
+  setTimeout(initializeBookingUI, 100); // Small delay to ensure DOM is updated
+});
+
+// For Turbo Drive / Turbolinks
+document.addEventListener('turbo:load', function() {
+  console.log('Turbo load detected - Reinitializing');
+  initializeBookingUI();
+});
+
+document.addEventListener('turbolinks:load', function() {
+  console.log('Turbolinks load detected - Reinitializing');
+  initializeBookingUI();
+});
+
+// Check if the page is already loaded
+if (document.readyState === 'complete') {
+  console.log('Document already loaded - Initializing immediately');
+  setTimeout(initializeBookingUI, 1);
+}
 </script>

@@ -54,7 +54,7 @@ class HomeController < ApplicationController
     
     # Ensure we have both dates
     unless start_date && end_date
-      redirect_to root_path, alert: t('messages.select_complete_range')
+      redirect_to root_path(locale: params[:locale]), alert: t('messages.select_complete_range')
       return
     end
     
@@ -66,14 +66,17 @@ class HomeController < ApplicationController
     # Create the date range record
     date_range = DateRange.new(start_date: start_date, end_date: end_date)
     
+    # Preserve the locale for redirects
+    locale_param = { locale: params[:locale] } if params[:locale].present?
+    
     if date_range.save
-      redirect_to root_path, notice: t('messages.range_saved_success')
+      redirect_to root_path(locale_param), notice: t('messages.range_saved_success')
     else
       error_message = "#{t('messages.save_error')}: #{date_range.errors.full_messages.join(', ')}"
-      redirect_to root_path(start_date: start_date, end_date: end_date), alert: error_message
+      redirect_to root_path(locale: params[:locale]), alert: error_message
     end
   rescue ArgumentError
-    redirect_to root_path, alert: t('messages.invalid_date_format')
+    redirect_to root_path(locale: params[:locale]), alert: t('messages.invalid_date_format')
   end
   
   private
