@@ -17,17 +17,27 @@
   z-index: 1000;
   display: flex;
   gap: 10px;
+  align-items: center;
 }
 
 .language-picker {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
 
 /* Style for the inline form to make it blend with the rest of the UI */
 .inline-form {
-  display: inline-block;
+  display: inline-flex;
   margin: 0;
   padding: 0;
+  height: 100%;
+}
+
+.auth-controls {
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
 
 /* Calendar day forms should maintain the grid layout */
@@ -36,7 +46,9 @@
 }
 
 .language-button, .nav-arrow, .today-button {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background-color: #6c757d;
   color: white;
   text-decoration: none;
@@ -48,6 +60,9 @@
   transition: background-color 0.2s, transform 0.1s;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   border: none; /* Remove default button border */
+  height: 38px; /* Fixed height */
+  line-height: 1;
+  box-sizing: border-box;
 }
 
 .language-button:hover, .nav-arrow:hover, .today-button:hover {
@@ -76,7 +91,9 @@ button.calendar-day {
 }
 
 .logout-button {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background-color: #dc3545;
   color: white;
   text-decoration: none;
@@ -87,6 +104,9 @@ button.calendar-day {
   cursor: pointer;
   transition: background-color 0.2s, transform 0.1s;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  height: 38px; /* Fixed height */
+  line-height: 1;
+  box-sizing: border-box;
 }
 
 .logout-button:hover {
@@ -578,14 +598,25 @@ button.calendar-day {
     top: 10px;
     right: 10px;
     z-index: 1000;
-    flex-direction: column;
+    flex-direction: row;
     gap: 5px;
+    align-items: center;
   }
   
   .language-button {
-    padding: 6px 12px;
-    font-size: 12px;
-    border-radius: 15px;
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 20px;
+    height: 38px;
+    box-sizing: border-box;
+  }
+  
+  .logout-button {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 20px;
+    height: 38px;
+    box-sizing: border-box;
   }
   
   /* Add top margin to calendar container to prevent overlap */
