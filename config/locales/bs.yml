@@ -1,4 +1,13 @@
 bs:
+  auth:
+    page_title: "Booking Autentikacija"
+    login_header: "Potrebna Autentikacija"
+    access_key: "Pristupni Ključ"
+    submit_button: "Prijava"
+    login_success: "Uspješno ste prijavljeni"
+    invalid_key: "Nevažeći pristupni ključ"
+    logout_success: "Uspješno ste odjavljeni"
+    
   date:
     formats:
       default: "%d.%m.%Y"

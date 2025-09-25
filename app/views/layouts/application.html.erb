@@ -41,17 +41,31 @@
   </head>
 
   <body>
-    <div class="language-picker">
-      <% if I18n.locale == :en %>
-        <%= link_to t('language.picker.bosnian'), switch_locale_path(:bs), 
-            class: "language-button", 
-            title: "#{t('language.picker.switch_to')} #{t('language.picker.bosnian')}",
-            data: { turbo: false } %>
-      <% else %>
-        <%= link_to t('language.picker.english'), switch_locale_path(:en), 
-            class: "language-button", 
-            title: "#{t('language.picker.switch_to')} #{t('language.picker.english')}",
-            data: { turbo: false } %>
+    <div class="header-controls">
+      <div class="language-picker">
+        <% if I18n.locale == :en %>
+          <%= form_with url: change_locale_path, method: :post, class: "inline-form", data: { turbo: false } do |f| %>
+            <%= f.hidden_field :new_locale, value: "bs" %>
+            <%= f.hidden_field :return_to, value: request.fullpath %>
+            <%= f.button t('language.picker.bosnian'), 
+                class: "language-button", 
+                title: "#{t('language.picker.switch_to')} #{t('language.picker.bosnian')}" %>
+          <% end %>
+        <% else %>
+          <%= form_with url: change_locale_path, method: :post, class: "inline-form", data: { turbo: false } do |f| %>
+            <%= f.hidden_field :new_locale, value: "en" %>
+            <%= f.hidden_field :return_to, value: request.fullpath %>
+            <%= f.button t('language.picker.english'), 
+                class: "language-button", 
+                title: "#{t('language.picker.switch_to')} #{t('language.picker.english')}" %>
+          <% end %>
+        <% end %>
+      </div>
+      
+      <% if authenticated? %>
+        <div class="auth-controls">
+          <%= link_to t('auth.logout'), logout_path, class: "logout-button", data: { turbo: false } %>
+        </div>
       <% end %>
     </div>
     

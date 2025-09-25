@@ -1,0 +1,18 @@
+<div class="login-container">
+  <h1><%= t('auth.login_header') %></h1>
+
+  <%= form_with url: authenticate_path, method: :post, class: "login-form" do |f| %>
+    <div class="form-group">
+      <%= f.label :access_key, t('auth.access_key') %>
+      <%= f.password_field :access_key, class: "form-control", autofocus: true, required: true %>
+    </div>
+
+    <div class="form-actions">
+      <%= f.submit t('auth.submit_button'), class: "btn btn-primary" %>
+    </div>
+  <% end %>
+
+  <% if flash[:alert] %>
+    <div class="alert alert-danger mt-3"><%= flash[:alert] %></div>
+  <% end %>
+</div>

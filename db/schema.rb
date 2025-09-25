@@ -10,7 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_20_221524) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_24_222123) do
+  create_table "access_keys", force: :cascade do |t|
+    t.string "key"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "active"
+  end
+
   create_table "date_ranges", force: :cascade do |t|
     t.date "start_date"
     t.date "end_date"

@@ -1,4 +1,13 @@
 en:
+  auth:
+    page_title: "Booking Authentication"
+    login_header: "Authentication Required"
+    access_key: "Access Key"
+    submit_button: "Login"
+    login_success: "Successfully logged in"
+    invalid_key: "Invalid access key"
+    logout_success: "Successfully logged out"
+    
   date:
     formats:
       default: "%Y-%m-%d"

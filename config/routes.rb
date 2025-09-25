@@ -1,8 +1,16 @@
 Rails.application.routes.draw do
+  # Authentication routes
+  get "login", to: "auth#login", as: "login"
+  post "authenticate", to: "auth#authenticate", as: "authenticate"
+  get "logout", to: "auth#logout", as: "logout"
+  
+  # Application routes
   get "home/index"
   post "home/save_range"
-  get "switch_locale/:locale", to: "application#switch_locale", as: "switch_locale"
-  get "reset_locale", to: "application#reset_locale", as: "reset_locale"
+  
+  # Locale routes - both form-based and API-based approaches that preserve session state
+  post "change_locale", to: "application#change_locale", as: "change_locale"
+  post "set_locale", to: "application#set_locale_api", as: "set_locale_api"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

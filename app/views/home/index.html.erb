@@ -8,6 +8,7 @@
   <div class="calendar-grid">
     <div class="month-navigation">
       <% # Preserve selection state when navigating months %>
+      <% # Previous month link without auth_state - it's handled by the cookie now %>
       <% prev_month_params = { 
            month: (@current_month - 1.month).month, 
            year: (@current_month - 1.month).year, 
@@ -17,10 +18,13 @@
       <% prev_month_params[:end_date] = @end_date.strftime('%Y-%m-%d') if @end_date %>
       
       <%= link_to "‹", root_path(prev_month_params), 
-          class: "nav-arrow prev-month", title: t('home.navigation.previous_month') %>
+          class: "nav-arrow prev-month", 
+          title: t('home.navigation.previous_month'),
+          data: { turbo: false } %>
       
       <h3><%= l(@current_month, format: :long) %></h3>
       
+      <% # Next month link without auth_state - it's handled by the cookie now %>
       <% next_month_params = { 
            month: (@current_month + 1.month).month, 
            year: (@current_month + 1.month).year, 
@@ -30,7 +34,9 @@
       <% next_month_params[:end_date] = @end_date.strftime('%Y-%m-%d') if @end_date %>
       
       <%= link_to "›", root_path(next_month_params), 
-          class: "nav-arrow next-month", title: t('home.navigation.next_month') %>
+          class: "nav-arrow next-month", 
+          title: t('home.navigation.next_month'),
+          data: { turbo: false } %>
     </div>
     
     <div class="calendar">
@@ -109,11 +115,36 @@
               <%= date.day %>
             </div>
           <% else %>
-            <% # Clickable dates %>
+            <% # Clickable dates using regular links - cookie handles auth now %>
+            <% fallback_url = if @start_date && !@end_date
+                            if date == @start_date
+                              # Same date clicked, start new selection
+                              root_path(start_date: date.strftime('%Y-%m-%d'), month: @current_month.month, year: @current_month.year, locale: I18n.locale)
+                            else
+                              # Check if this end date would conflict with booked dates
+                              range_start = [@start_date, date].min
+                              range_end = [@start_date, date].max
+                              conflicts_with_bookings = (range_start + 1.day...range_end).any? { |d| @booked_dates.include?(d) }
+                              
+                              if conflicts_with_bookings
+                                # Conflict detected - start new selection with this date
+                                root_path(start_date: date.strftime('%Y-%m-%d'), month: @current_month.month, year: @current_month.year, locale: I18n.locale)
+                              else
+                                # No conflict, complete the range
+                                root_path(start_date: @start_date.strftime('%Y-%m-%d'), end_date: date.strftime('%Y-%m-%d'), month: @current_month.month, year: @current_month.year, locale: I18n.locale)
+                              end
+                            end
+                         else
+                            # Starting new selection
+                            root_path(start_date: date.strftime('%Y-%m-%d'), month: @current_month.month, year: @current_month.year, locale: I18n.locale)
+                         end
+            %>
+            
             <a href="<%= fallback_url %>" class="<%= css_classes.join(' ') %>" 
-                 data-date="<%= date.strftime('%Y-%m-%d') %>"
-                 data-month="<%= @current_month.month %>"
-                 data-year="<%= @current_month.year %>">
+                data-date="<%= date.strftime('%Y-%m-%d') %>"
+                data-month="<%= @current_month.month %>"
+                data-year="<%= @current_month.year %>"
+                data-turbo="false">
               <%= date.day %>
             </a>
           <% end %>
@@ -141,7 +172,9 @@
           <% today_params = { locale: I18n.locale } %>
           <% today_params[:start_date] = @start_date.strftime('%Y-%m-%d') if @start_date %>
           <% today_params[:end_date] = @end_date.strftime('%Y-%m-%d') if @end_date %>
-          <%= link_to t('home.go_to_today'), root_path(today_params), class: "today-button" %>
+          <%= link_to t('home.go_to_today'), root_path(today_params), 
+              class: "today-button", 
+              data: { turbo: false } %>
         <% end %>
         
         <% if @start_date && @end_date %>

@@ -1,5 +1,8 @@
 class HomeController < ApplicationController
   def index
+    # Authentication is now handled by the parent class using cookies
+    # We don't need to manually set auth state from parameters anymore
+    
     # Handle current month/year for calendar display
     # Only use params if both month and year are present, otherwise default to current date
     if params[:month].present? && params[:year].present?
