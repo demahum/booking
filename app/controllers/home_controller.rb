@@ -88,7 +88,7 @@ class HomeController < ApplicationController
     if date_range.save
       # Send email notification about new reservation
       begin
-        NotificationMailer.reservation_created(date_range, current_access_key).deliver_later
+        #NotificationMailer.reservation_created(date_range, current_access_key).deliver_later
         Rails.logger.info "=== EMAIL NOTIFICATION QUEUED FOR DATE RANGE #{date_range.id} ==="
       rescue => e
         # Log the error but don't fail the booking process
