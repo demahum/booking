@@ -8,6 +8,7 @@ module SessionDebug
       Rails.logger.info "  auth_cookie = #{cookies.signed[ApplicationController::AUTH_COOKIE_NAME].present? ? 'PRESENT' : 'NOT PRESENT'}\n"
       # Remove the call to authenticated? which was causing infinite recursion
       Rails.logger.info "  session[:locale] = #{session[:locale].inspect}\n"
+      Rails.logger.info "  session[:access_key_id] = #{session[:access_key_id].inspect}\n"
       Rails.logger.info "  request.referer = #{request.referer.inspect}\n"
       Rails.logger.info "  request.path = #{request.path.inspect}\n"
       Rails.logger.info "  params = #{params.except(:authenticity_token).inspect}\n"

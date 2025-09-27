@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_24_222123) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_27_075253) do
   create_table "access_keys", force: :cascade do |t|
     t.string "key"
     t.datetime "created_at", null: false
@@ -23,5 +23,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_24_222123) do
     t.date "end_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "access_key_id"
+    t.index ["access_key_id"], name: "index_date_ranges_on_access_key_id"
   end
+
+  add_foreign_key "date_ranges", "access_keys"
 end

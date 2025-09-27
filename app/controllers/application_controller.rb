@@ -82,11 +82,16 @@ class ApplicationController < ActionController::Base
         secure: Rails.env.production?
       }
       
+      # Preserve the access_key_id if it's in the session
+      # This will be set separately in the auth controller
+      
       log_session_info("SETTING AUTHENTICATION - Token created")
     else
       # Clear both session and cookie
       session[:authenticated] = nil
+      session[:access_key_id] = nil  # Also clear the access key ID
       cookies.delete(AUTH_COOKIE_NAME)
+      cookies.delete("access_key_id")
       
       log_session_info("CLEARING AUTHENTICATION")
     end
