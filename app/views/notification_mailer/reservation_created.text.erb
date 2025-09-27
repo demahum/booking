@@ -1,0 +1,11 @@
+NEW RESERVATION CREATED
+
+A new reservation has been created with the following details:
+
+Check-in Date: <%= @date_range.start_date.strftime('%B %d, %Y') %>
+Check-out Date: <%= @date_range.end_date.strftime('%B %d, %Y') %>
+Total Nights: <%= (@date_range.end_date - @date_range.start_date).to_i %>
+Access Key: <%= @access_key ? @access_key.key : 'No access key used' %>
+Created At: <%= @created_at.strftime('%B %d, %Y at %H:%M') %>
+
+This is an automated notification. Please do not reply to this email.

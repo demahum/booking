@@ -86,6 +86,15 @@ class HomeController < ApplicationController
     locale_param = { locale: params[:locale] } if params[:locale].present?
     
     if date_range.save
+      # Send email notification about new reservation
+      begin
+        NotificationMailer.reservation_created(date_range, current_access_key).deliver_later
+        Rails.logger.info "=== EMAIL NOTIFICATION QUEUED FOR DATE RANGE #{date_range.id} ==="
+      rescue => e
+        # Log the error but don't fail the booking process
+        Rails.logger.error "=== ERROR SENDING EMAIL NOTIFICATION: #{e.message} ==="
+      end
+      
       redirect_to root_path(locale_param), notice: t('messages.range_saved_success')
     else
       error_message = "#{t('messages.save_error')}: #{date_range.errors.full_messages.join(', ')}"

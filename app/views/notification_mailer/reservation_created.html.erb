@@ -1,0 +1,30 @@
+<h1>New Reservation Created</h1>
+
+<p>A new reservation has been created with the following details:</p>
+
+<table style="border-collapse: collapse; width: 100%; max-width: 500px;">
+  <tr>
+    <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Check-in Date:</th>
+    <td style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;"><%= @date_range.start_date.strftime('%B %d, %Y') %></td>
+  </tr>
+  <tr>
+    <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Check-out Date:</th>
+    <td style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;"><%= @date_range.end_date.strftime('%B %d, %Y') %></td>
+  </tr>
+  <tr>
+    <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Total Nights:</th>
+    <td style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;"><%= (@date_range.end_date - @date_range.start_date).to_i %></td>
+  </tr>
+  <tr>
+    <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Access Key:</th>
+    <td style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;"><%= @access_key ? @access_key.key : 'No access key used' %></td>
+  </tr>
+  <tr>
+    <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Created At:</th>
+    <td style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;"><%= @created_at.strftime('%B %d, %Y at %H:%M') %></td>
+  </tr>
+</table>
+
+<p style="margin-top: 20px;">
+  This is an automated notification. Please do not reply to this email.
+</p>
